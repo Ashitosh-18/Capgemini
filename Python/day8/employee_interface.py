@@ -105,3 +105,5 @@ it_department.show_employee_details()
 # Total salary in the department
 total_salary = it_department.get_total_salary()
 print(f"Total salary expense for {it_department.name} department: ${total_salary}")
+
+#hwllo AHI
