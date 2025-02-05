@@ -4,7 +4,7 @@ import time
 def task(lock):
     with lock:
         print(f"{threading.current_thread().name} has acquired the lock")
-        time.sleep(2)
+        time.sleep(4)
         print(f"{threading.current_thread().name} has released the lock")
         
 lock=threading.Lock()
