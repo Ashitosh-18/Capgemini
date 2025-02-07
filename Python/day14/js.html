@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Welcome to JavaScript</title>
+        <script>
+            function onBtnclick() {
+                var textBoxValue1 = document.getElementById("txtName1").value;  // Accessing value of text box
+                var textBoxValue2 = document.getElementById("txtName2").value;
+
+                var fullName = textBoxValue1 + " " + textBoxValue2;
+
+                alert(fullName); // Displaying the value in an alert 
+
+                var lb1local = document.getElementById("lb1Result"); 
+                lb1local.innerText="Welcome" +" "+fullName;
+            }
+            document.write("Hello world");
+        </script>
+    </head>
+
+    <body>
+        <marquee>CMR is not good</marquee>
+
+        <table border="1">
+            <tr>
+                <td>
+                    <label id="lbName1">First Name</label>
+                    <input type="text" id="txtName1">
+                 </td>
+            </tr>
+            <tr>
+                <td>
+                    <label id="lbName2">Last Name</label>
+                    <input type="text" id="txtName2">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="button" id="btname" value="Click here to submit" onclick="onBtnclick()">
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+        <label id="lb1Result"></label>
+
+        <h1>Virat Kohli</h1>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Virat_Kohli_during_the_India_vs_Aus_4th_Test_match_at_Narendra_Modi_Stadium_on_09_March_2023.jpg/330px-Virat_Kohli_during_the_India_vs_Aus_4th_Test_match_at_Narendra_Modi_Stadium_on_09_March_2023.jpg" alt="He is a legend" width="200px" style="display: block;">
+    </body>
+
+    <footer>
+        Thank You
+    </footer>
+</html>

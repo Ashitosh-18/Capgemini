@@ -1,0 +1,6 @@
+Customer_ID,Name,Age,Email,Country,Purchase_Amount
+101,Alice,25,alice@example.com,USA,250.75
+102,Bob,30,bob@example.com,Canada,300.5
+103,Charlie,35,charlie@example.com,UK,120.0
+104,David,40,david@example.com,Germany,500.0
+105,Eve,28,eve@example.com,India,450.25
