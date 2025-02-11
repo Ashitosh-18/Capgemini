@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Data</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: rgb(58, 198, 216);
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Cars List Using for Loop</h2>
+    <ul id="carsList"></ul>
+
+    <h2>Cars List Using map</h2>
+    <ul id="carsListMap"></ul>
+    
+    <script>
+        // Step 1: Create an array of car names
+        let cars = ["Audi", "Bugatti", "Rolls Royce"];
+
+        // Step 2: Display Car names using a for loop
+        let carsList = document.getElementById("carsList");
+
+        for (let i = 0; i < cars.length; i++) {
+            let listItem = document.createElement("li");
+            listItem.textContent = cars[i];
+            carsList.appendChild(listItem);
+        }
+
+        // Step 3: Display Car names using map()
+        let carsListMap = document.getElementById("carsListMap");
+
+        cars.map(car => {
+            let listItem = document.createElement("li");
+            listItem.textContent = car;
+            carsListMap.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
+
