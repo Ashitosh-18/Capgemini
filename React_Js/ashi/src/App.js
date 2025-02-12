@@ -1,23 +1,18 @@
-import logo from './logo.svg';
 import './App.css';
+import Header from './day17/components/Header';
+import Footer from './day17/components/Footer';
+import Body from './day17/components/Body';
+import InterestCalculator from './day17/intrest_calc';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          add <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header/>
+      <Body/>
+      <InterestCalculator/>
+      <br/>
+      <Footer/>
+      <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer"> Learn React </a>
     </div>
   );
 }
