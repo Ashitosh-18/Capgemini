@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Message Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        .error-box {
+            display: none; /* Initially hidden */
+            background-color: #ff4c4c;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px auto;
+            width: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Click the button to display an error message 🚨</h2>
+    
+    <button onclick="showError()">Show Error</button>
+
+    <div id="errorMessage" class="error-box">
+        ⚠️ Error: Something went wrong! Please try again.
+    </div>
+
+    <script>
+        function showError() {
+            document.getElementById("errorMessage").style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
