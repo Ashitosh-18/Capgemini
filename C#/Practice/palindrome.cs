@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿/*using System.Linq;
 using System;
 
 namespace Practice_questions
@@ -83,3 +83,4 @@ public class ReverseString
     }
 }
 }
+*/
