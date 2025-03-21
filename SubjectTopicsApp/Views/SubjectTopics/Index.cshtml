@@ -1,121 +1,50 @@
-﻿@model List<SubjectTopic>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Subject Topics</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
 
 <h2>Subject Topics</h2>
+    <ul id="topics-list"></ul>
 
-@if (Model != null && Model.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Topic ID</th>
-                <th>Topic Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="topicTableBody">
-            @foreach (var topic in Model)
-            {
-                <tr>
-                    <td>@topic.TopicId</td>
-                    <td><a href="#" class="topic-link" data-id="@topic.TopicId">@topic.TopicName</a></td>
-                    <td>
-                        <button class="btn btn-primary edit-topic" data-id="@topic.TopicId">Edit</button>
-                        <button class="btn btn-danger delete-topic" data-id="@topic.TopicId">Delete</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No topics found. Check your database.</p>
-}
+    <h2>Subtopics</h2>
+    <ul id="subtopics-list"></ul>
 
-<button id="createTopicBtn" class="btn btn-success">Create New Topic</button>
-<input type="text" id="newTopicName" placeholder="Enter Topic Name">
-<button id="saveTopicBtn" class="btn btn-primary">Save</button>
-
-@section Scripts {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
+            loadTopics();
 
-            // Load Topics on Page Load
             function loadTopics() {
-                $.get('/SubjectTopics/GetAllTopics', function(response) {
-                    $('#topicTableBody').empty();
-                    $.each(response, function(index, topic) {
-                        $('#topicTableBody').append(`
-                            <tr>
-                                <td>${topic.topicId}</td>
-                                <td><a href="#" class="topic-link" data-id="${topic.topicId}">${topic.topicName}</a></td>
-                                <td>
-                                    <button class="btn btn-primary edit-topic" data-id="${topic.topicId}">Edit</button>
-                                    <button class="btn btn-danger delete-topic" data-id="${topic.topicId}">Delete</button>
-                                </td>
-                            </tr>
-                        `);
+                $.get("/SubjectTopics/GetAllTopics", function (data) {
+                    $("#topics-list").empty();
+                    $.each(data, function (index, topic) {
+                        $("#topics-list").append(`<li>
+                                    <a href="#" class="topic-link" data-id="${topic.topicId}">${topic.topicName}</a>
+                        </li>`);
                     });
                 });
             }
-            loadTopics(); // Initial Load
 
-            // Create Topic
-            $('#saveTopicBtn').click(function() {
-                let topicName = $('#newTopicName').val().trim();
-                if (topicName === "") {
-                    alert("Enter a topic name.");
-                    return;
-                }
+            $(document).on("click", ".topic-link", function () {
+                var topicId = $(this).data("id");
 
-                $.post('/SubjectTopics/Create', { TopicName: topicName }, function(response) {
-                    if (response.success) {
-                        $('#topicTableBody').append(`
-                            <tr>
-                                <td>${response.topic.topicId}</td>
-                                <td><a href="#" class="topic-link" data-id="${response.topic.topicId}">${response.topic.topicName}</a></td>
-                                <td>
-                                    <button class="btn btn-primary edit-topic" data-id="${response.topic.topicId}">Edit</button>
-                                    <button class="btn btn-danger delete-topic" data-id="${response.topic.topicId}">Delete</button>
-                                </td>
-                            </tr>
-                        `);
-                        $('#newTopicName').val('');
+                $.get("/Subtopics/GetByTopic?topicId=" + topicId, function (data) {
+                    $("#subtopics-list").empty();
+                    if (data.success === false) {
+                        $("#subtopics-list").append(`<li>${data.message}</li>`);
                     } else {
-                        alert("Failed to create topic.");
-                    }
-                });
+                        $.each(data, function (index, subtopic) {
+                            $("#subtopics-list").append(`<li>${subtopic.subtopicId} - ${subtopic.subtopicName}</li>`);
             });
-
-            // Edit Topic
-            $(document).on('click', '.edit-topic', function() {
-                let topicId = $(this).data('id');
-                let newName = prompt('Enter new Topic Name:');
-                if (newName) {
-                    $.post('/SubjectTopics/Edit', { TopicId: topicId, TopicName: newName }, function(response) {
-                        if (response.success) {
-                            $(`.topic-link[data-id="${topicId}"]`).text(newName);
-                        } else {
-                            alert("Failed to update topic.");
-                        }
-                    });
                 }
             });
-
-            // Delete Topic
-            $(document).on('click', '.delete-topic', function() {
-                let topicId = $(this).data('id');
-                if (confirm('Are you sure you want to delete this topic?')) {
-                    $.post('/SubjectTopics/Delete', { TopicId: topicId }, function(response) {
-                        if (response.success) {
-                            $(`tr:has(.topic-link[data-id="${topicId}"])`).remove();
-                        } else {
-                            alert("Failed to delete topic.");
-                        }
                     });
-                }
             });
-
-        });
     </script>
-}
+
+</body>
+</html>

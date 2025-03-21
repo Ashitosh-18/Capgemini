@@ -12,7 +12,6 @@ namespace SubjectTopicsApp.Controllers
         {
             _context = context;
         }
-
         [HttpGet]
         public JsonResult GetByTopic(int topicId)
         {
@@ -30,7 +29,6 @@ namespace SubjectTopicsApp.Controllers
                 _context.SaveChanges();
                 return Json(newSubtopic);
             }
-            return Json(null);
         }
 
         [HttpPost]
