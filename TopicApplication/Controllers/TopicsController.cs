@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SubjectTopicsApp.Models;
-using SubjectTopicsApp.Data;
+using TopicApplication.Data;
+using TopicApplication.Models;
 
-namespace SubjectTopicsApp.Controllers
+namespace TopicApplication.Controllers
 {
-    public class SubjectTopicsController : Controller
+    public class TopicsController : Controller
     {
         private ApplicationDbContext dbContext;
 
-        public SubjectTopicsController(ApplicationDbContext dbContext)
+        public TopicsController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
@@ -36,7 +36,7 @@ namespace SubjectTopicsApp.Controllers
                 return BadRequest("Topic name cannot be empty.");
             }
 
-            var newTopic = new Topics { TopicName = topic };
+            var newTopic = new Topics { Topic = topic };
             dbContext.Topics.Add(newTopic);
             await dbContext.SaveChangesAsync();
 
@@ -64,7 +64,7 @@ namespace SubjectTopicsApp.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateTopic([FromBody] TopicUpdateRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.TopicName))
+            if (string.IsNullOrWhiteSpace(request.Topic))
             {
                 return BadRequest("Topic name cannot be empty.");
             }
@@ -75,7 +75,7 @@ namespace SubjectTopicsApp.Controllers
                 return NotFound();
             }
 
-            topic.TopicName = request.TopicName;
+            topic.Topic = request.Topic;
             await dbContext.SaveChangesAsync();
 
             return Ok();
@@ -85,7 +85,7 @@ namespace SubjectTopicsApp.Controllers
         public class TopicUpdateRequest
         {
             public int TopicId { get; set; }
-            public string TopicName { get; set; }
+            public string Topic { get; set; }
         }
 
 
@@ -97,8 +97,8 @@ namespace SubjectTopicsApp.Controllers
             {
                 return BadRequest("Subtopic name cannot be empty.");
             }
-
-            var newSubtopic = new SubTopics { SubtopicName = subtopic, TopicID = topicId };
+            
+            var newSubtopic = new SubTopics { Subtopic = subtopic, TopicID = topicId };
             dbContext.SubTopics.Add(newSubtopic);
             await dbContext.SaveChangesAsync();
 
@@ -111,7 +111,7 @@ namespace SubjectTopicsApp.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateSubtopic([FromBody] SubtopicUpdateRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.SubtopicName))
+            if (string.IsNullOrWhiteSpace(request.Subtopic))
             {
                 return BadRequest("Subtopic name cannot be empty.");
             }
@@ -122,7 +122,7 @@ namespace SubjectTopicsApp.Controllers
                 return NotFound();
             }
 
-            subtopic.SubtopicName = request.SubtopicName;
+            subtopic.Subtopic = request.Subtopic;
             await dbContext.SaveChangesAsync();
 
             var subtopics = await dbContext.SubTopics.Where(s => s.TopicID == request.TopicID).ToListAsync();
@@ -144,13 +144,13 @@ namespace SubjectTopicsApp.Controllers
 
             var subtopics = await dbContext.SubTopics.Where(s => s.TopicID == topicId).ToListAsync();
             return PartialView("_SubtopicsPartial", subtopics);
-        } 
+        }
 
         // DTO for updating subtopics
         public class SubtopicUpdateRequest
         {
             public int SubtopicID { get; set; }
-            public string SubtopicName { get; set; }
+            public string Subtopic { get; set; }
             public int TopicID { get; set; } // Keeps track of the selected topic
         }
 

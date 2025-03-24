@@ -1,0 +1,132 @@
+﻿@model IEnumerable<SubjectTopicsApp.Models.SubTopics>
+
+<div class="mt-3">
+    <style>
+        .subtopic-scroll-container {
+            max-height: 150px; /* Adjust height to fit 3 subtopics */
+            overflow-y: auto;
+            border: 1px solid #ccc; /* Optional: for visibility */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Optional: Ensure the fixed input field does not move */
+        .fixed-subtopic-input {
+            position: sticky;
+            bottom: 0;
+            background: #fff; /* Match page background */
+            padding: 10px;
+            /* border-top: 1px solid #ccc; */
+        }
+
+    </style>
+    @if (Model.Any())
+    {
+        <!-- Scrollable Container for Subtopics -->
+        <div class="subtopic-scroll-container">
+            <ul class="list-group">
+                @foreach (var subtopic in Model)
+                {
+                    <li class="d-flex justify-content-between align-items-center mb-2 subtopic-wrapper"
+                        data-subtopic-id="@subtopic.SubtopicID" data-topic-id="@subtopic.TopicID">
+                        <!-- Subtopic Display -->
+                        <div class="d-flex flex-grow-1 align-items-center subtopic-container">
+                            <span class="subtopic-text flex-grow-1">@subtopic.SubtopicName</span>
+                            <input type="text" class="form-control subtopic-input d-none flex-grow-1 me-2" value="@subtopic.SubtopicName" />
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm save-subtopic-btn d-none">✔</button>
+                            <button class="btn btn-secondary btn-sm cancel-subtopic-btn d-none">❌</button>
+                            <a href="javascript:void(0);" class="btn btn-primary btn-sm edit-subtopic-btn">Edit</a>
+                            <a href="javascript:void(0);" class="btn btn-danger btn-sm delete-subtopic-btn" data-subtopic-id="@subtopic.SubtopicID">Delete</a>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No subtopics found.</p>
+    }
+
+    <!-- Fixed Input Field for Adding Subtopics -->
+    <div class="d-flex mt-2 fixed-subtopic-input">
+        <label class="me-2 align-self-center fw-bold">Subtopic:</label>
+        <input type="text" class="form-control me-2 subtopic-input" placeholder="Enter new subtopic">
+        <button class="btn btn-primary add-subtopic-btn" data-topic-id="@ViewData["TopicID"]">Add</button>
+    </div>
+
+    <!-- Error message display -->
+    <div id="subtopic-error-message" class="text-danger mt-2" style="display: none;"></div>
+</div>
+
+
+
+@section Scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        // Edit Subtopic
+        $(".edit-subtopic-btn").click(function () {
+            var container = $(this).closest("li");
+            container.find(".subtopic-text").addClass("d-none");
+            container.find(".subtopic-input, .save-subtopic-btn, .cancel-subtopic-btn").removeClass("d-none");
+        });
+
+        // Cancel Edit
+        $(".cancel-subtopic-btn").click(function () {
+            var container = $(this).closest("li");
+            container.find(".subtopic-input").val(container.find(".subtopic-text").text()); // Reset value
+            container.find(".subtopic-text").removeClass("d-none");
+            container.find(".subtopic-input, .save-subtopic-btn, .cancel-subtopic-btn").addClass("d-none");
+        });
+
+        // Save Edited Subtopic
+        $(".save-subtopic-btn").click(function () {
+            var container = $(this).closest("li");
+            var subtopicId = container.data("subtopic-id");
+            var topicId = container.data("topic-id");
+            var newSubtopicName = container.find(".subtopic-input").val().trim();
+
+            if (newSubtopicName === "") {
+                alert("Subtopic name cannot be empty.");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("UpdateSubtopic", "Topics")',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ SubTopicID: subtopicId, SubTopic: newSubtopicName, TopicID: topicId }),
+                success: function (response) {
+                    $("#subtopics-container").html(response); // Reload subtopics without resetting topic selection
+                },
+                error: function () {
+                    alert("Error updating subtopic.");
+                }
+            });
+        });
+
+        // Delete Subtopic
+        $(".delete-subtopic-btn").click(function () {
+            var subtopicId = $(this).data("subtopic-id");
+            $.ajax({
+                url: '@Url.Action("DeleteSubtopic", "Topics")',
+                type: 'POST',
+                data: { subtopicId: subtopicId },
+                success: function (response) {
+                    $("#subtopics-container").html(response); // Reload subtopics dynamically
+                },
+                error: function () {
+                    alert("Error deleting subtopic.");
+                }
+            });
+        });
+    });
+</script>
+}

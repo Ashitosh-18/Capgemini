@@ -1,0 +1,247 @@
+﻿@model IEnumerable<SubjectTopicsApp.Models.Topics>
+@{
+    ViewData["Title"] = "Topics";
+}
+
+<h2>Topics</h2>
+
+<div class="container">
+    <style>
+        .highlighted-topic {
+            background-color: #dff0d8; /* Light green */
+            border-left: 5px solid #4caf50; /* Green border */
+            padding-left: 10px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .topic-scroll-container {
+            max-height: 200px; /* Adjust based on your layout */
+            overflow-y: auto;
+            border: 1px solid #ccc; /* Optional: for visibility */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        /* Optional: Ensure the fixed input field does not move */
+        .fixed-topic-input {
+            position: sticky;
+            bottom: 0;
+            background: #fff; /* Match page background */
+            padding: 10px;
+            /* border-top: 1px solid #ccc; */
+        }
+
+
+    </style>
+
+
+    <!-- Topics List -->
+    <!-- Add margin-top to create space between topics and input field -->
+    <div class="mt-4 topic-scroll-container">
+        @foreach (var topic in Model)
+        {
+            <div class="d-flex justify-content-between align-items-center  py-2 topic-wrapper" data-topic-id="@topic.TopicID">
+                <!-- Topic Display -->
+                <div class="d-flex flex-grow-1 align-items-center topic-container">
+                    <a href="javascript:void(0);" class="fw-bold topic-text flex-grow-1 subtopic-link" data-topic-id="@topic.TopicID">@topic.TopicName</a>
+                    <input type="text" class="form-control topic-input d-none flex-grow-1 me-2" value="@topic.TopicName" />
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-sm save-btn d-none">✔</button>
+                    <button class="btn btn-secondary btn-sm cancel-btn d-none">❌</button>
+                    <a href="javascript:void(0);" class="btn btn-primary btn-sm edit-btn" data-topic-id="@topic.TopicID">Edit</a>
+                    <a href="javascript:void(0);" class="btn btn-danger btn-sm delete-btn" data-topic-id="@topic.TopicID">
+                        Delete
+                    </a>
+                    @* <a href="javascript:void(0);" class="btn btn-success btn-sm subtopic-btn" data-topic-id="@topic.TopicID"> *@
+                    @*     Subtopics *@
+                    @* </a> *@
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Input field & Add Button with margin-top -->
+    <div class="d-flex mb-3 mt-2 fixed-topic-input">
+        <label class="me-2 align-self-center fw-bold">Topic:</label>
+        <input type="text" id="newTopic" class="form-control me-2" placeholder="Enter new topic">
+        <button id="addTopicBtn" class="btn btn-primary">Add</button>
+    </div>
+    <!-- Error message display -->
+    <div id="error-message" class="text-danger mt-2" style="display: none;"></div>
+
+
+    <h2>SubTopics</h2>
+    <div id="subtopics-container">
+        <!-- Subtopics will be loaded dynamically here -->
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+                function highlightTopic(topicWrapper) {
+            $(".topic-wrapper").removeClass("highlighted-topic");
+            topicWrapper.addClass("highlighted-topic");
+        }
+
+
+        $(".edit-btn, .subtopic-link").click(function () {
+            var topicWrapper = $(this).closest(".topic-wrapper");
+            highlightTopic(topicWrapper);
+        });
+
+            // Add Topic - AJAX
+            $("#addTopicBtn").click(function () {
+                var topicName = $("#newTopic").val().trim();
+                     $("#error-message").hide().text(""); // Clear previous errors
+
+        if (topicName === "") {
+            $("#error-message").text("Please enter a topic name.").show();
+            return;
+        }
+                // if (topicName === "") {
+                //     alert("Please enter a topic name.");
+                //     return;
+                // }
+
+                $.ajax({
+                    url: '@Url.Action("AddTopic", "Topics")',
+                    type: 'POST',
+                    data: { topic: topicName },
+                    success: function () {
+                        location.reload(); // Reload page to show new topic
+                    },
+                    error: function () {
+                        alert("Error adding topic.");
+                    }
+                });
+            });
+
+                function selectFirstTopic() {
+            var firstTopic = $(".topic-wrapper").first();// Select the first topic
+
+            if (firstTopic.length > 0) {
+                highlightTopic(firstTopic); //Highlight the first topic
+                var firstTopicId = firstTopic.data("topic-id");
+                console.log(firstTopicId);
+                loadSubtopics(firstTopicId); //Load its subtopics
+            }
+        }
+
+
+        // Run function when the page loads
+        selectFirstTopic();
+
+
+
+
+                    // Edit Topic
+        $(".edit-btn").click(function () {
+            var container = $(this).closest(".d-flex.justify-content-between");
+            container.find(".topic-text").addClass("d-none");
+            container.find(".topic-input, .save-btn, .cancel-btn").removeClass("d-none");
+        });
+
+        // Cancel Edit
+        $(".cancel-btn").click(function () {
+            var container = $(this).closest(".d-flex.justify-content-between");
+            container.find(".topic-input").val(container.find(".topic-text").text()); // Reset value
+            container.find(".topic-text").removeClass("d-none");
+            container.find(".topic-input, .save-btn, .cancel-btn").addClass("d-none");
+        });
+
+        // Save Edited Topic
+        $(".save-btn").click(function () {
+            var container = $(this).closest(".d-flex.justify-content-between");
+            var topicId = container.find(".topic-container").data("topic-id");
+            var newTopicName = container.find(".topic-input").val().trim();
+
+            if (newTopicName === "") {
+                alert("Topic name cannot be empty.");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("UpdateTopic", "Topics")',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ topicId: topicId, topic: newTopicName }),
+                success: function () {
+                    container.find(".topic-text").text(newTopicName).removeClass("d-none");
+                    container.find(".topic-input, .save-btn, .cancel-btn").addClass("d-none");
+                },
+                error: function () {
+                    alert("Error updating topic.");
+                }
+            });
+        });
+
+                    function loadSubtopics(topicId) {
+            $.ajax({
+                url: '@Url.Action("GetSubtopics", "Topics")',
+                type: 'GET',
+                data: { topicId: topicId },
+                success: function (result) {
+                    $("#subtopics-container").html(result);
+                },
+                error: function () {
+                    console.log("Error loading subtopics."); // Avoid alert
+                }
+            });
+        }
+
+        // Call function with parameters inside click event
+        $(".subtopic-link").click(function () {
+            var topicId = $(this).data("topic-id");
+            loadSubtopics(topicId); // Call function with argument
+        });
+
+
+                    $(document).on("click", ".add-subtopic-btn", function () {
+            var topicId = $(".highlighted-topic").data("topic-id"); // Get selected topic ID
+            var subtopicName = $(this).siblings(".subtopic-input").val().trim();
+
+            $("#subtopic-error-message").hide().text(""); // Clear previous errors
+
+            if (subtopicName === "") {
+                $("#subtopic-error-message").text("Please enter a subtopic name.").show();
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddSubtopic", "Topics")',
+                type: 'POST',
+                data: { topicId: topicId, subtopicName: subtopicName },
+                success: function (result) {
+                    $("#subtopics-container").html(result); // Update Subtopics UI
+                },
+                error: function (xhr, status, error) {
+                    alert("Error adding subtopic: " + xhr.responseText);
+                }
+            });
+        });
+
+
+            // Delete Topic - AJAX
+            $(".delete-btn").click(function () {
+                var topicId = $(this).data("topic-id");
+
+                $.ajax({
+                    url: '@Url.Action("DeleteTopic", "Topics")',
+                    type: 'POST',
+                    data: { topicId: topicId },
+                    success: function () {
+                        location.reload();
+                    },
+                    error: function () {
+                        alert("Error deleting topic.");
+                    }
+                });
+            });
+        });
+    </script>
+}

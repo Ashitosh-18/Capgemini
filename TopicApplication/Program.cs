@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SubjectTopicsApp.Data;
+using TopicApplication.Data;
 
-namespace SubjectTopicsApp
+namespace TopicApplication
 {
     public class Program
     {
